@@ -9,7 +9,7 @@ export type Offer = {
   host: User;
   id: number;
   images: string[];
-  isFavorite: boolean; //TODO добавить
+  isFavorite: boolean;
   isPremium: boolean;
   location: {
     latitude: number;
@@ -22,5 +22,6 @@ export type Offer = {
   rating: number;
   title: string;
   type: string;
+  postDate: Date;
   commentsLength: number;
 };

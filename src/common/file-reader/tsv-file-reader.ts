@@ -22,25 +22,34 @@ export default class TSVFileReader implements FileReaderInterface {
       .map((line) => line.split('\t'))
       .map(([id, title, description, createdDate, city, previewImage, images, isPremium, rating, type, bedrooms, maxAdults, price, goods, host, commentsLength, location, isFavorite]) => ({
         bedrooms: Number(bedrooms),
-        city: city.split(';')
-          .map(([name, latitude, longitude, zoom]) => ({
-            name,
-            location: {
-              latitude: Number(latitude),
-              longitude: Number(longitude),
-              zoom: Number(zoom),
-            },
-          })),
+        city: {
+          name: 'Paris',
+          location: {
+            latitude: 1,
+            longitude: 1,
+            zoom: 1,
+          },
+        },
         description,
         goods: goods.split(';')
-          .map((good) => ({good})),
-        host,
+          .map((good) => (good)),
+        host: {
+          avatarUrl: '1',
+          id: 1,
+          isPro: false,
+          name: 'Pavel',
+        },
         id: Number(id),
-        images,
+        images: images.split(';')
+          .map((image) => (image)),
         isFavorite: Boolean(isFavorite),
         isPremium: Boolean(isPremium),
-        location,
-        maxAdults,
+        location: {
+          latitude: 1,
+          longitude: 1,
+          zoom: 1,
+        },
+        maxAdults: Number(maxAdults),
         previewImage,
         price: Number(price),
         rating: Number(rating),
