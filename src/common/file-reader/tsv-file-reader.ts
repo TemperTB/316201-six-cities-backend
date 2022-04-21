@@ -20,34 +20,33 @@ export default class TSVFileReader implements FileReaderInterface {
       .split('\n')
       .filter((row) => row.trim() !== '')
       .map((line) => line.split('\t'))
-      .map(([id, title, description, createdDate, city, previewImage, images, isPremium, rating, type, bedrooms, maxAdults, price, goods, host, commentsLength, location, isFavorite]) => ({
+      .map(([id, title, description, createdDate, city, previewImage, images, isPremium, rating, type, bedrooms, maxAdults, price, goods, user, commentsLength, location, isFavorite]) => ({
         bedrooms: Number(bedrooms),
         city: {
-          name: 'Paris',
+          name: city.split(';')[0],
           location: {
-            latitude: 1,
-            longitude: 1,
-            zoom: 1,
+            latitude: Number(city.split(';')[1]),
+            longitude: Number(city.split(';')[2]),
+            zoom: Number(city.split(';')[3]),
           },
         },
         description,
-        goods: goods.split(';')
-          .map((good) => (good)),
+        goods: goods.split(';'),
         host: {
-          avatarUrl: '1',
-          id: 1,
-          isPro: false,
-          name: 'Pavel',
+          avatarUrl: user.split(';')[0],
+          id: Number(user.split(';')[1]),
+          isPro: Boolean(user.split(';')[2]),
+          name: user.split(';')[3],
+          password: user.split(';')[4],
         },
         id: Number(id),
-        images: images.split(';')
-          .map((image) => (image)),
+        images: images.split(';'),
         isFavorite: Boolean(isFavorite),
         isPremium: Boolean(isPremium),
         location: {
-          latitude: 1,
-          longitude: 1,
-          zoom: 1,
+          latitude: Number(location.split(';')[0]),
+          longitude: Number(location.split(';')[1]),
+          zoom: Number(location.split(';')[2]),
         },
         maxAdults: Number(maxAdults),
         previewImage,
