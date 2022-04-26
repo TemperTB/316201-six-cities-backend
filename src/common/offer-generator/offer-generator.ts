@@ -37,7 +37,7 @@ export default class OfferGenerator implements OfferGeneratorInterface {
     const price = generateRandomValue(MIN_PRICE, MAX_PRICE);
     const goods = getRandomItems<string>(this.mockData.goods);
     const user = {
-      name: getRandomItem<string>(this.mockData.types),
+      name: getRandomItem<string>(this.mockData.names),
       avatarUrl: getRandomItem<string>(this.mockData.avatarUrls),
       id: nanoid(),
       isPro: generateRandomValue(0, 1),
@@ -52,9 +52,9 @@ export default class OfferGenerator implements OfferGeneratorInterface {
 
     return [
       id, title,
-      description, createdDate, city, previewImage,
+      description, createdDate, Object.values(city).join(';'), previewImage,
       images, isPremium, rating, type, bedrooms, maxAdults,
-      price, goods, user, commentsLength, location,
+      price, goods, Object.values(user).join(';'), commentsLength, Object.values(location).join(';'),
       isFavorite,
     ].join('\t');
   }
