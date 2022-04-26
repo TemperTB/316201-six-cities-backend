@@ -1,3 +1,4 @@
+import chalk from 'chalk';
 import { appendFile } from 'fs/promises';
 import got from 'got';
 import OfferGenerator from '../common/offer-generator/offer-generator.js';
@@ -15,7 +16,7 @@ export default class GenerateCommand implements CliCommandInterface {
     try {
       this.initialData = await got.get(url).json();
     } catch {
-      return console.log(`Can't fetch data from ${url}.`);
+      return console.log(chalk.black.bgRed.bold(`Can't fetch data from ${url}.`));
     }
 
     const offerGeneratorString = new OfferGenerator(this.initialData);
@@ -24,7 +25,7 @@ export default class GenerateCommand implements CliCommandInterface {
       await appendFile(filepath, `${offerGeneratorString.generate()}\n`, 'utf8');
     }
 
-    console.log(`File ${filepath} was created!`);
+    console.log(chalk.black.bgGreen.bold(`File ${filepath} was created!`));
 
   }
 }
