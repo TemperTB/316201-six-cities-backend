@@ -9,5 +9,6 @@ export type MockData = {
   names: string[];
   emails: string[];
   avatarUrls: string[];
+  passwords: string[];
   cities: City[];
 };

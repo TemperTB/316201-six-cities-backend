@@ -94,6 +94,17 @@
       "avatart-09.jpg",
       "avatart-10.jpg"
     ],
+    "passwords": [
+      "abcdef",
+      "abc123",
+      "123456",
+      "abcdefghi",
+      "abcd12345",
+      "123456789",
+      "abcdefghijkl",
+      "abcdef123456",
+      "123456789012"
+    ],
     "cities": [
       {
         "name": "Paris",

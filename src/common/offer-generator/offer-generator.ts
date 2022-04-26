@@ -1,5 +1,5 @@
 import dayjs from 'dayjs';
-import { nanoid } from 'nanoid';
+import { customAlphabet } from 'nanoid';
 import { City } from '../../types/cities.type';
 import { MockData } from '../../types/mock-data.type';
 import { generateRandomValue, getRandomItem, getRandomItems } from '../../utils/utils.js';
@@ -17,7 +17,7 @@ const MIN_COMMENTS_LENGTH = 0;
 const MAX_COMMENTS_LENGTH = 10;
 const FIRST_WEEK_DAY = 1;
 const LAST_WEEK_DAY = 7;
-
+const nanoid = customAlphabet('1234567890', 10);
 export default class OfferGenerator implements OfferGeneratorInterface {
   constructor(private readonly mockData: MockData) {}
 
@@ -27,8 +27,10 @@ export default class OfferGenerator implements OfferGeneratorInterface {
     const description = getRandomItem<string>(this.mockData.descriptions);
     const createdDate = dayjs().subtract(generateRandomValue(FIRST_WEEK_DAY, LAST_WEEK_DAY), 'day').toISOString();
     const city = getRandomItem<City>(this.mockData.cities);
+    const cityString = `${city.name};${city.location.latitude};${city.location.longitude};${city.location.zoom}`;
     const previewImage = getRandomItem<string>(this.mockData.images);
     const images = getRandomItems<string>(this.mockData.images);
+    const imagesString = images.join(';');
     const isPremium = generateRandomValue(0, 1);
     const rating = generateRandomValue(MIN_RATING, MAX_RATING, 1);
     const type = getRandomItem<string>(this.mockData.types);
@@ -36,25 +38,30 @@ export default class OfferGenerator implements OfferGeneratorInterface {
     const maxAdults = generateRandomValue(MIN_ADULTS_COUNT, MAX_ADULTS_COUNT);
     const price = generateRandomValue(MIN_PRICE, MAX_PRICE);
     const goods = getRandomItems<string>(this.mockData.goods);
+    const goodsString = goods.join(';');
     const user = {
-      name: getRandomItem<string>(this.mockData.names),
       avatarUrl: getRandomItem<string>(this.mockData.avatarUrls),
       id: nanoid(),
       isPro: generateRandomValue(0, 1),
+      name: getRandomItem<string>(this.mockData.names),
+      email: getRandomItem<string>(this.mockData.emails),
+      password: getRandomItem<string>(this.mockData.passwords),
     };
+    const userString = Object.values(user).join(';');
     const commentsLength = generateRandomValue(MIN_COMMENTS_LENGTH, MAX_COMMENTS_LENGTH, 0);
     const location = {
       latitude: generateRandomValue(1, 1 + 0.01, 6),
       longitude: generateRandomValue(1, 1 + 0.01, 6),
       zoom: city.location.zoom,
     };
+    const locationString = Object.values(location).join(';');
     const isFavorite = generateRandomValue(0, 1);
 
     return [
       id, title,
-      description, createdDate, Object.values(city).join(';'), previewImage,
-      images, isPremium, rating, type, bedrooms, maxAdults,
-      price, goods, Object.values(user).join(';'), commentsLength, Object.values(location).join(';'),
+      description, createdDate, cityString, previewImage,
+      imagesString, isPremium, rating, type, bedrooms, maxAdults,
+      price, goodsString, userString, commentsLength, locationString,
       isFavorite,
     ].join('\t');
   }
