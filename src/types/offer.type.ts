@@ -1,4 +1,5 @@
 import { City } from './cities.type';
+import { Location } from './location.type';
 import { User } from './user.type';
 
 export type Offer = {
@@ -11,11 +12,7 @@ export type Offer = {
   images: string[];
   isFavorite: boolean;
   isPremium: boolean;
-  location: {
-    latitude: number;
-    longitude: number;
-    zoom: number;
-  };
+  location: Location;
   maxAdults: number;
   previewImage: string;
   price: number;
