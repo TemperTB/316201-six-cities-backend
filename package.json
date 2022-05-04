@@ -10,6 +10,7 @@
   "main": "main.js",
   "scripts": {
     "start": "npm run build && node ./dist/main.js",
+    "start:dev": "npm run ts ./src/main.ts | pino-pretty --colorize --translateTime SYS:standard",
     "build": "npm run clean && npm run compile",
     "lint": "eslint src/ --ext .ts",
     "compile": "tsc -p tsconfig.json",
@@ -18,6 +19,8 @@
     "mock:server": "json-server ./mocks/mock-server-data.json --port 3123"
   },
   "devDependencies": {
+    "@types/convict": "6.1.1",
+    "@types/convict-format-with-validator": "6.0.2",
     "@types/node": "16.11.26",
     "@typescript-eslint/eslint-plugin": "5.18.0",
     "@typescript-eslint/parser": "5.18.0",
@@ -30,13 +33,20 @@
   },
   "type": "module",
   "engines": {
-    "node": "^16.13.0",
-    "npm": "^8.1.0"
+    "node": "16.13.0",
+    "npm": "8.1.0"
   },
   "dependencies": {
-    "chalk": "^5.0.1",
+    "chalk": "5.0.1",
+    "convict": "6.2.2",
+    "convict-format-with-validator": "6.2.0",
     "dayjs": "1.11.1",
+    "dotenv": "16.0.0",
     "got": "12.0.4",
-    "nano-id": "1.1.0"
+    "inversify": "6.0.1",
+    "nano-id": "1.1.0",
+    "pino": "7.11.0",
+    "pino-pretty": "7.6.1",
+    "reflect-metadata": "0.1.13"
   }
 }
