@@ -1,51 +1,47 @@
 import { Offer } from '../types/offer.type.js';
+import { OfferType } from '../types/offer-type.enum.js';
+import crypto from 'crypto';
 
 /**
  * Разбирает строку импорта из формата TSV
  */
 export const createOffer = (row: string) => {
   const tokens = row.replace('\n', '').split('\t');
-  const [id, title, description, createdDate, city, previewImage, images, isPremium, rating, type, bedrooms, maxAdults, price, goods, user, commentsLength, location, isFavorite] = tokens;
+  const [id, title, description, createdDate, city, previewImage, images, isPremium, rating, type, bedrooms, maxAdults, price, goods, user, commentCount, locationLtd, locationLng, locationZoom, isFavorite] = tokens;
   const [cityName, cityLtd, cityLng, cityZoom] = city.split(';');
-  const [userAvatar, userId, userStatus, userName, userEmail, userPassword] = user.split(';');
-  const [lng, ltd, zoom] = location.split(';');
+  const [userAvatar, userStatus, userName, userEmail, userPassword] = user.split(';');
   return {
     bedrooms: Number(bedrooms),
     city: {
       name: cityName,
-      location: {
-        latitude: Number(cityLtd),
-        longitude: Number(cityLng),
-        zoom: Number(cityZoom),
-      },
+      ltd: Number(cityLtd),
+      lng: Number(cityLng),
+      zoom: Number(cityZoom),
     },
     description,
     goods: goods.split(';'),
-    host: {
+    user: {
       avatarUrl: userAvatar,
-      id: Number(userId),
-      isPro: Boolean(userStatus),
+      isPro: Boolean(+userStatus),
       name: userName,
       email: userEmail,
       password: userPassword,
     },
     id: Number(id),
     images: images.split(';'),
-    isFavorite: Boolean(isFavorite),
-    isPremium: Boolean(isPremium),
-    location: {
-      latitude: Number(lng),
-      longitude: Number(ltd),
-      zoom: Number(zoom),
-    },
+    isFavorite: Boolean(+isFavorite),
+    isPremium: Boolean(+isPremium),
+    locationLtd: Number(locationLtd),
+    locationLng: Number(locationLng),
+    locationZoom: Number(locationZoom),
     maxAdults: Number(maxAdults),
     previewImage,
     price: Number(price),
     rating: Number(rating),
     title,
-    type,
+    type: OfferType[type as 'Apartment' | 'House' | 'Room' | 'Hotel'],
     postDate: new Date(createdDate),
-    commentsLength: Number(commentsLength),
+    commentCount: Number(commentCount),
   } as Offer;
 };
 
@@ -54,3 +50,11 @@ export const createOffer = (row: string) => {
  */
 export const getErrorMessage = (error: unknown): string =>
   error instanceof Error ? error.message : '';
+
+/**
+   * Вычисляет ХЭШ строки
+   */
+export const createSHA256 = (line: string, salt: string): string => {
+  const shaHasher = crypto.createHmac('sha256', salt);
+  return shaHasher.update(line).digest('hex');
+};

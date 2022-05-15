@@ -1,7 +1,7 @@
-import { Location } from './location.type';
-
 export type City = {
     name: string;
-    location: Location;
+    ltd: number;
+    lng: number;
+    zoom: number;
   };
 

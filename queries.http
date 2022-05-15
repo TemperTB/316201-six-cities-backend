@@ -3,5 +3,3 @@ GET http://localhost:3123/api HTTP/1.1
 
 ###
 
-GET https://sbermegamarket.ru/catalog/details/kuler-dlya-processora-be-quiet-dark-rock-pro-4-600004431058 HTTP/1.1
-
