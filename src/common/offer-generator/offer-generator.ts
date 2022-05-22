@@ -13,8 +13,8 @@ const MIN_ADULTS_COUNT = 1;
 const MAX_ADULTS_COUNT = 10;
 const MIN_RATING = 1;
 const MAX_RATING = 5;
-const MIN_COMMENTS_LENGTH = 0;
-const MAX_COMMENTS_LENGTH = 10;
+const MIN_COMMENTS_COUNT = 0;
+const MAX_COMMENTS_COUNT = 10;
 const FIRST_WEEK_DAY = 1;
 const LAST_WEEK_DAY = 7;
 const nanoid = customAlphabet('1234567890', 10);
@@ -27,7 +27,7 @@ export default class OfferGenerator implements OfferGeneratorInterface {
     const description = getRandomItem<string>(this.mockData.descriptions);
     const createdDate = dayjs().subtract(generateRandomValue(FIRST_WEEK_DAY, LAST_WEEK_DAY), 'day').toISOString();
     const city = getRandomItem<City>(this.mockData.cities);
-    const cityString = `${city.name};${city.location.latitude};${city.location.longitude};${city.location.zoom}`;
+    const cityString = `${city.name};${city.ltd};${city.lng};${city.zoom}`;
     const previewImage = getRandomItem<string>(this.mockData.images);
     const images = getRandomItems<string>(this.mockData.images);
     const imagesString = images.join(';');
@@ -41,28 +41,24 @@ export default class OfferGenerator implements OfferGeneratorInterface {
     const goodsString = goods.join(';');
     const user = {
       avatarUrl: getRandomItem<string>(this.mockData.avatarUrls),
-      id: nanoid(),
       isPro: generateRandomValue(0, 1),
       name: getRandomItem<string>(this.mockData.names),
       email: getRandomItem<string>(this.mockData.emails),
       password: getRandomItem<string>(this.mockData.passwords),
     };
     const userString = Object.values(user).join(';');
-    const commentsLength = generateRandomValue(MIN_COMMENTS_LENGTH, MAX_COMMENTS_LENGTH, 0);
-    const location = {
-      latitude: generateRandomValue(1, 1 + 0.01, 6),
-      longitude: generateRandomValue(1, 1 + 0.01, 6),
-      zoom: city.location.zoom,
-    };
-    const locationString = Object.values(location).join(';');
+    const commentCount = generateRandomValue(MIN_COMMENTS_COUNT, MAX_COMMENTS_COUNT, 0);
+    const locationLtd = generateRandomValue(1, 1 + 0.01, 6);
+    const locationLng = generateRandomValue(1, 1 + 0.01, 6);
+    const locationZoom = city.zoom;
     const isFavorite = generateRandomValue(0, 1);
 
     return [
       id, title,
       description, createdDate, cityString, previewImage,
       imagesString, isPremium, rating, type, bedrooms, maxAdults,
-      price, goodsString, userString, commentsLength, locationString,
-      isFavorite,
+      price, goodsString, userString, commentCount, locationLtd,
+      locationLng, locationZoom, isFavorite,
     ].join('\t');
   }
 }

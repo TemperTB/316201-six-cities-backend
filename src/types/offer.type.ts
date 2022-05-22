@@ -1,5 +1,5 @@
 import { City } from './cities.type';
-import { Location } from './location.type';
+import { OfferType } from './offer-type.enum';
 import { User } from './user.type';
 
 export type Offer = {
@@ -7,18 +7,19 @@ export type Offer = {
   city: City;
   description: string;
   goods: string[];
-  host: User;
-  id: number;
+  user: User;
   images: string[];
   isFavorite: boolean;
   isPremium: boolean;
-  location: Location;
+  locationLtd: number;
+  locationLng: number;
+  locationZoom: number;
   maxAdults: number;
   previewImage: string;
   price: number;
   rating: number;
   title: string;
-  type: string;
+  type: OfferType;
   postDate: Date;
-  commentsLength: number;
+  commentCount: number;
 };
