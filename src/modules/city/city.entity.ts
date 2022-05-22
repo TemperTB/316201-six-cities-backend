@@ -1,50 +1,39 @@
-import {User} from '../../types/user.type.js';
 import typegoose, {getModelForClass} from '@typegoose/typegoose';
 import {Base, TimeStamps} from '@typegoose/typegoose/lib/defaultClasses.js';
-import {createSHA256} from '../../utils/common.js';
+import { City } from '../../types/cities.type';
 
 const {prop, modelOptions} = typegoose;
 
-export interface UserEntity extends Base {}
+export interface CityEntity extends Base {}
 
 @modelOptions({
   schemaOptions: {
-    collection: 'users'
+    collection: 'cities'
   }
 })
 
-export class UserEntity extends TimeStamps implements User {
+export class CityEntity extends TimeStamps implements City {
 
-  constructor(data: User) {
+  constructor(data: City) {
     super();
-    this.email = data.email;
-    this.avatarUrl = data.avatarUrl;
     this.name = data.name;
-    this.isPro = data.isPro;
+    this.ltd = data.ltd;
+    this.lng = data.lng;
+    this.zoom = data.zoom;
   }
 
   @prop({ unique: true, required: true })
-  public email!: string;
-
-  @prop({required: true, default: 'avatar-angelina.jpg'})
-  public avatarUrl!: string;
-
-  @prop({required: true})
   public name!: string;
 
   @prop({required: true})
-  public isPro!: boolean;
+  public ltd!: number;
 
   @prop({required: true})
-  private password!: string;
+  public lng!: number;
 
-  public setPassword(password: string, salt: string) {
-    this.password = createSHA256(password, salt);
-  }
+  @prop({required: true, default: 10})
+  public zoom!: number;
 
-  public getPassword() {
-    return this.password;
-  }
 }
 
-export const UserModel = getModelForClass(UserEntity);
+export const CityModel = getModelForClass(CityEntity);

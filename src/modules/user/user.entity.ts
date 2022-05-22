@@ -29,7 +29,7 @@ export class UserEntity extends TimeStamps implements User {
   @prop({required: true, default: 'avatar-angelina.jpg'})
   public avatarUrl!: string;
 
-  @prop({required: true})
+  @prop({required: true, trim: true})
   public name!: string;
 
   @prop({required: true})

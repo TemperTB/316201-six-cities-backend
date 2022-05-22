@@ -8,7 +8,6 @@ export type Offer = {
   description: string;
   goods: string[];
   user: User;
-  id: number;
   images: string[];
   isFavorite: boolean;
   isPremium: boolean;

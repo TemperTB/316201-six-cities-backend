@@ -1,5 +1,4 @@
 import { Offer } from '../types/offer.type.js';
-import { OfferType } from '../types/offer-type.enum.js';
 import crypto from 'crypto';
 
 /**
@@ -39,7 +38,7 @@ export const createOffer = (row: string) => {
     price: Number(price),
     rating: Number(rating),
     title,
-    type: OfferType[type as 'Apartment' | 'House' | 'Room' | 'Hotel'],
+    type,
     postDate: new Date(createdDate),
     commentCount: Number(commentCount),
   } as Offer;

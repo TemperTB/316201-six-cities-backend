@@ -1,9 +1,9 @@
-import CreateUserDto from './dto/city-user.dto.js';
 import {DocumentType} from '@typegoose/typegoose/lib/types.js';
-import {UserEntity} from './city.entity.js';
+import { CityEntity } from './city.entity';
+import CreateCityDto from './dto/city-user.dto';
 
-export interface UserServiceInterface {
-  create(dto: CreateUserDto, salt: string): Promise<DocumentType<UserEntity>>;
-  findByEmail(email: string): Promise<DocumentType<UserEntity> | null>;
-  findOrCreate(dto: CreateUserDto, salt: string): Promise<DocumentType<UserEntity>>;
+export interface CityServiceInterface {
+  create(dto: CreateCityDto): Promise<DocumentType<CityEntity>>;
+  findByName(name: string): Promise<DocumentType<CityEntity> | null>;
+  findOrCreate(dto: CreateCityDto): Promise<DocumentType<CityEntity>>;
 }
