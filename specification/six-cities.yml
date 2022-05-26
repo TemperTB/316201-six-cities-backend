@@ -1,0 +1,555 @@
+openapi: 3.0.1
+info:
+  title: REST API сервер для демо-проекта «6 городов».
+  description: |-
+    * Список ресурсов и маршрутов сервера «6 городов».
+  license:
+    name: MIT
+    url: https://opensource.org/licenses/MIT
+  version: 1.0.0
+tags:
+  - name: offer
+    description: Предложение по аренде.
+  - name: comment
+    description: Комментарии.
+  - name: users
+    description: Пользователи.
+  - name: favorite
+    description: Избранное.
+paths:
+  /offers/:
+    get:
+      tags:
+        - offer
+      summary: Получить список предложений
+      description: Возвращает список предложений.
+      operationId: getOffers
+      parameters:
+        - name: count
+          in: query
+          description: Количество предложений
+          allowEmptyValue: true
+          schema:
+            type: integer
+            format: int32
+            example: 100
+      responses:
+        '200':
+          description: Массив предложений
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/Offer'
+        '404':
+          description: Предложений не найдено
+          content: {}
+    post:
+      tags:
+        - offer
+      summary:  Создание нового предложения
+      description:  Создание нового предложения.
+      operationId: createOffer
+      requestBody:
+        description: Объект с новым предложением
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/Createoffer'
+        required: true
+      responses:
+        '201':
+          description: Новое предложение
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/Offer'
+        '400':
+          description: Ошибка тела запроса
+          content: {}
+        '404':
+          description: Предложение не найдено
+          content: {}
+  /offers/{offerId}:
+    get:
+      tags:
+        - offer
+      summary: Получить детальную информацию по предложению
+      description: Возвращает предложение с идентификатором `offerId`.
+      operationId: getOfferById
+      parameters:
+        - name: offerId
+          in: path
+          description: Уникальный идентификатор предложения
+          required: true
+          schema:
+            type: string
+            example: f17c1
+      responses:
+        '200':
+          description: Объект Предложения
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Offer'
+        '404':
+          description: Предложение не найдено
+          content: {}
+    put:
+      tags:
+        - offer
+      summary: Редактировать предложение
+      description: Обновляет предложение с идентификатором `offerId`.
+      operationId: updateOfferById
+      parameters:
+        - name: offerId
+          in: path
+          description: Уникальный идентификатор предложения
+          required: true
+          schema:
+            type: string
+            example: f17c1
+      requestBody:
+        description: Объект с изменённым предложением
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/Createoffer'
+        required: true
+      responses:
+        '200':
+          description: Объект предложения
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Offer'
+        '404':
+          description: Предложение не найдено
+          content: {}
+    delete:
+      tags:
+        - offer
+      summary: Удалить предложение
+      description: Удаляет предложение с идентификатором `offerId`.
+      operationId: deleteOfferById
+      parameters:
+        - name: offerId
+          in: path
+          description: Уникальный идентификатор предложения
+          required: true
+          schema:
+            type: string
+            example: f17c1
+      responses:
+        '200':
+          description: Предложение удалено
+          content: {}
+        '404':
+          description: Предложение не найдено
+          content: {}
+  /offers/premium:
+    get:
+      tags:
+        - offer
+      summary: Получить список премиум предложений
+      description: Возвращает массив премиум предложений. Каждое предложение описано в виде объекта.
+      operationId: getPremiumOffers
+      responses:
+        '200':
+          description: Массив предложений
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/Offer'
+  /offers/favorite:
+    get:
+      tags:
+        - favorite
+      summary: Получить список избранных предложений
+      description: Возвращает массив избранных предложений. Каждое предложение описано в виде объекта.
+      operationId: getFavoriteOffers
+      responses:
+        '200':
+          description: Массив предложений
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/Offer'
+  /offers/favorite/{offerId}/{status}:
+    post:
+      tags:
+        - favorite
+      summary:  Добавление и удаление предложения в/из избранного
+      description:  Добавление и удаление предложения в/из избранного.
+      operationId: changeOfferStatus
+      parameters:
+        - name: offerId
+          in: path
+          description: Уникальный идентификатор предложения
+          required: true
+          schema:
+            type: string
+            example: f17c1
+        - name: status
+          in: path
+          description: Статус
+          required: true
+          schema:
+            type: number
+            enum:
+            - 0
+            - 1
+      requestBody:
+        description: Объект с новым статусом
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/Createoffer'
+        required: true
+      responses:
+        '201':
+          description: Новый статус
+          content:
+            application/json:
+              schema:
+                items:
+                  $ref: '#/components/schemas/Offer'
+        '400':
+          description: Ошибка тела запроса
+          content: {}
+        '404':
+          description: Предложение не найдено
+          content: {}
+  /offers/{offerId}/comments:
+    get:
+      tags:
+        - comment
+      summary: Получить список комментариев
+      description: Возвращает список комментариев для предложения с идентификатором `offerId`.
+      operationId: getComment
+      parameters:
+        - name: offerId
+          in: path
+          description: Уникальный идентификатор предложения
+          required: true
+          schema:
+            type: string
+            example: f17c1
+      responses:
+        '200':
+          description: Массив комментариев
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/Comment'
+        '404':
+          description: Предложение не найдено
+          content: {}
+    post:
+      tags:
+        - comment
+      summary: Добавить новый комментарий
+      description: Добавляет новый комментарий для предложения с идентификатором `offerId`.
+      operationId: postComment
+      parameters:
+        - name: offerId
+          in: path
+          description: Уникальный идентификатор предложения
+          required: true
+          schema:
+            type: string
+            example: f17c1
+      requestBody:
+        description: Объект с новым комментарием
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CreateComment'
+        required: true
+      responses:
+        '201':
+          description: Новый комментарий
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Comment'
+        '400':
+          description: Ошибка тела запроса
+          content: {}
+        '404':
+          description: Предложение не найдено
+          content: {}
+  /users/register:
+    post:
+      tags:
+        - users
+      summary: Создать нового пользователя
+      description: Создает нового пользователя.
+      operationId: registerUser
+      requestBody:
+        description: Объект, содержащий данные пользователя.
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/RegisterUser'
+        required: true
+      responses:
+        '200':
+          description: Статус авторизации
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/AuthorizationInfo'
+        '400':
+          description: Ошибка тела запроса
+          content: {}
+        '409':
+          description: Пользователь с таким email существует
+          content: {}
+  /users/login:
+    get:
+      tags:
+        - users
+      summary: Проверка состояния пользователя
+      description: Проверка состояния пользователя.
+      operationId: checkUserStatus
+      requestBody:
+        description: X-Token для проверки.
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/AuthorizationInfo'
+        required: true
+      responses:
+        '200':
+          description: Статус авторизации пользователя
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/CreateUser'
+        '400':
+          description: Пользователь не авторизован
+          content: {}
+    post:
+      tags:
+        - users
+      summary: Авторизоваться на сервере
+      description: Авторизоваться на сервере.
+      operationId: loginUser
+      requestBody:
+        description: Объект, содержащий данные пользователя.
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/RegisterUser'
+        required: true
+      responses:
+        '200':
+          description: Успешная авторизация
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/CreateUser'
+        '400':
+          description: Ошибка тела запроса
+          content: {}
+  /users/logout:
+    delete:
+      tags:
+        - users
+      summary: Завершить сеанс пользователя
+      description: Завершить сеанс пользователя.
+      operationId: logoutUser
+      parameters:
+        - name: x-token
+          in: path
+          description: X-Token
+          required: true
+          schema:
+            type: string
+            example: T2xpdmVyLmNvbm5lckBnbWFpbC5jb20=
+      responses:
+        '204':
+          description: Сеанс завершен
+          content: {}
+components:
+  schemas:
+    Createoffer:
+      type: object
+      properties:
+        bedrooms:
+          type: integer
+          format: int32
+          example: 2
+        city:
+          $ref: '#/components/schemas/City'
+        description:
+          type: string
+          example: Самое очешуительное предложение
+        goods:
+          type: array
+          enum:
+            - Breakfast
+            - Air conditioning
+            - Laptop friendly workspace
+            - Baby seat
+            - Washer
+            - Towels
+            - Fridge
+          example: [Breakfast, Towels, Fridge]
+        user:
+          $ref: '#/components/schemas/User'
+        images:
+          type: array
+          example: [image_one, image_two, image_three]
+        isFavorite:
+          type: boolean
+          example: false
+        isPremium:
+          type: boolean
+          example: false
+        locationLtd:
+          type: integer
+          format: int64
+          example: 48.85661
+        locationLng:
+          type: integer
+          format: int64
+          example: 2.351499
+        locationZoom:
+          type: integer
+          format: int32
+          example: 10
+        maxAdults:
+          type: integer
+          format: int32
+          example: 2
+        previewImage:
+          type: string
+          example: image_one
+        price:
+          type: integer
+          format: int32
+          example: 1000
+        rating:
+          type: integer
+          format: int32
+          example: 3
+        title:
+          type: string
+          example: Отличное местечко
+        type:
+          type: string
+          enum:
+            - apartment
+            - house
+            - room
+            - hotel
+        postDate:
+          type: string
+          example: 2021-12-12T21:55:28.147Z
+    Offer:
+      allOf:
+        - type: object
+          properties:
+            id:
+              type: string
+              example: f17c1
+            commentCount:
+              type: integer
+              format: int32
+              example: 5
+        - $ref: '#/components/schemas/Createoffer'
+    CreateComment:
+      type: object
+      properties:
+        text:
+          type: string
+          example: Всем советую сюда ехать без жены. Здесь куча молодых леди.
+        rating:
+          type: integer
+          format: int32
+          example: 5
+        postDate:
+          type: string
+          example: 2021-12-12T21:55:28.147Z
+        user:
+          $ref: '#/components/schemas/User'
+    Comment:
+      allOf:
+        - type: object
+          properties:
+            id:
+              type: string
+              example: eb0af
+        - $ref: '#/components/schemas/CreateComment'
+    CreateUser:
+      type: object
+      properties:
+        avatarUrl:
+          type: string
+          example: https://{url}/static/avatar/1.jpg
+        name:
+          type: string
+          example: Oliver Twist
+        isPro:
+          type: boolean
+          example: true
+        email:
+          type: string
+          example: OliverTwist@gmail.com
+    User:
+      allOf:
+        - type: object
+          properties:
+            id:
+              type: string
+              example: 2dd9c
+        - $ref: '#/components/schemas/CreateUser'
+    City:
+      allOf:
+        - type: object
+          properties:
+            id:
+              type: string
+              example: 2dd9c
+            name:
+              type: string
+              example: Paris
+            ltd:
+              type: integer
+              format: int64
+              example: 48.85661
+            lng:
+              type: integer
+              format: int64
+              example: 2.351499
+            zoom:
+              type: integer
+              format: int32
+              example: 10
+    RegisterUser:
+      allOf:
+        - $ref: '#/components/schemas/CreateUser'
+        - type: object
+          properties:
+            password:
+              type: string
+              example: password
+    AuthorizationInfo:
+      allOf:
+        - $ref: '#/components/schemas/User'
+        - type: object
+          properties:
+            token:
+              type: string
+              example: T2xpdmVyLmNvbm5lckBnbWFpbC5jb20
