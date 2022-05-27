@@ -10,10 +10,10 @@ export default class HelpCommand implements CliCommandInterface {
         ${chalk.black.bgWhite.bold('Пример:')}
             main.js ${chalk.cyan('--<command>')} ${chalk.magenta('[--arguments]')}
         ${chalk.black.bgWhite.bold('Команды:')}
-            ${chalk.cyan('--version')}:                    # выводит номер версии
-            ${chalk.cyan('--help')}                        # печатает этот текст
-            ${chalk.cyan('--import')} ${chalk.magenta('<path>')}:              # импортирует данные из TSV
-            ${chalk.cyan('--generator')} ${chalk.magenta('<n> <path> <url>')}: # генерирует произвольное количество тестовых данных
+            ${chalk.cyan('--version')}:                                                                                                                                                                                         # выводит номер версии
+            ${chalk.cyan('--help')}                                                                                                                                                                                             # печатает этот текст
+            ${chalk.cyan('--import')} ${chalk.magenta('<path>')} ${chalk.magenta('<DB_USER>')} ${chalk.magenta('<DB_PASSWORD>')} ${chalk.magenta('<DB_HOST>')} ${chalk.magenta('<DB_NAME>')} ${chalk.magenta('<SALT>')}:        # импортирует данные из TSV
+            ${chalk.cyan('--generator')} ${chalk.magenta('<n> <path> <url>')}:                                                                                                                                                  # генерирует произвольное количество тестовых данных
         `);
   }
 }
