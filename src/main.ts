@@ -17,6 +17,8 @@ import { CityServiceInterface } from './modules/city/city-service.interface.js';
 import { OfferEntity, OfferModel } from './modules/offer/offer.entity.js';
 import { OfferServiceInterface } from './modules/offer/offer-service.interface.js';
 import OfferService from './modules/offer/offer.service.js';
+import {ControllerInterface} from './common/controller/controller.interface.js';
+import OfferController from './modules/offer/offer.controller.js';
 
 const applicationContainer = new Container();
 applicationContainer.bind<Application>(Component.Application).to(Application).inSingletonScope();
@@ -29,6 +31,8 @@ applicationContainer.bind<CityServiceInterface>(Component.CityServiceInterface).
 applicationContainer.bind<ModelType<CityEntity>>(Component.CityModel).toConstantValue(CityModel);
 applicationContainer.bind<OfferServiceInterface>(Component.OfferServiceInterface).to(OfferService);
 applicationContainer.bind<ModelType<OfferEntity>>(Component.OfferModel).toConstantValue(OfferModel);
+
+applicationContainer.bind<ControllerInterface>(Component.OfferController).to(OfferController).inSingletonScope();
 
 const application = applicationContainer.get<Application>(Component.Application);
 await application.init();
