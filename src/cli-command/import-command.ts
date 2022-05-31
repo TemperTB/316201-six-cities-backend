@@ -29,7 +29,6 @@ export default class ImportCommand implements CliCommandInterface {
     this.onComplete = this.onComplete.bind(this);
     this.logger = new ConsoleLoggerService();
     this.offerService = new OfferService(this.logger, OfferModel);
-    // this.categoryService = new CategoryService(this.logger, CategoryModel);
     this.userService = new UserService(this.logger, UserModel);
     this.cityService = new CityService(this.logger, CityModel);
     this.databaseService = new DatabaseService(this.logger);
@@ -67,7 +66,6 @@ export default class ImportCommand implements CliCommandInterface {
 
   private async onLine(line: string, resolve: () => void) {
     const offer = createOffer(line);
-    //console.log(offer); //TODO убрать вконце
     await this.saveOffer(offer);
     resolve();
   }

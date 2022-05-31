@@ -81,6 +81,7 @@ export class OfferEntity extends TimeStamps {
     required: true,
   })
   public cityId!: Ref<CityEntity>;
+
 }
 
 export const OfferModel = getModelForClass(OfferEntity);

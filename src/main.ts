@@ -19,6 +19,9 @@ import { OfferServiceInterface } from './modules/offer/offer-service.interface.j
 import OfferService from './modules/offer/offer.service.js';
 import {ControllerInterface} from './common/controller/controller.interface.js';
 import OfferController from './modules/offer/offer.controller.js';
+import { ExceptionFilterInterface } from './common/errors/exception-filter.interface.js';
+import ExceptionFilter from './common/errors/exception-filter.js';
+import UserController from './modules/user/user.controller.js';
 
 const applicationContainer = new Container();
 applicationContainer.bind<Application>(Component.Application).to(Application).inSingletonScope();
@@ -31,8 +34,9 @@ applicationContainer.bind<CityServiceInterface>(Component.CityServiceInterface).
 applicationContainer.bind<ModelType<CityEntity>>(Component.CityModel).toConstantValue(CityModel);
 applicationContainer.bind<OfferServiceInterface>(Component.OfferServiceInterface).to(OfferService);
 applicationContainer.bind<ModelType<OfferEntity>>(Component.OfferModel).toConstantValue(OfferModel);
-
 applicationContainer.bind<ControllerInterface>(Component.OfferController).to(OfferController).inSingletonScope();
+applicationContainer.bind<ExceptionFilterInterface>(Component.ExceptionFilterInterface).to(ExceptionFilter).inSingletonScope();
+applicationContainer.bind<ControllerInterface>(Component.UserController).to(UserController).inSingletonScope();
 
 const application = applicationContainer.get<Application>(Component.Application);
 await application.init();
