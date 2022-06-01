@@ -26,4 +26,9 @@ export default class OfferService implements OfferServiceInterface {
     return this.offerModel.findById(id).exec();
   }
 
+  public async find(): Promise<DocumentType<OfferEntity>[]> {
+    return this.offerModel.find();
+  }
+
+
 }
