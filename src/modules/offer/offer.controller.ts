@@ -1,5 +1,4 @@
 import 'reflect-metadata';
-//import {plainToInstance} from 'class-transformer';
 import {Request, Response} from 'express';
 import {inject, injectable} from 'inversify';
 import {Controller} from '../../common/controller/controller.js';
@@ -11,6 +10,12 @@ import {StatusCodes} from 'http-status-codes';
 import OfferDto from './dto/offer.dto.js';
 import {fillDTO} from '../../utils/common.js';
 import CreateOfferDto from './dto/create-offer.dto.js';
+import HttpError from '../../common/errors/http-error.js';
+import * as core from 'express-serve-static-core';
+
+type ParamsGetOffer = {
+  offerId: string;
+}
 
 @injectable()
 export default class OfferController extends Controller {
@@ -21,8 +26,10 @@ export default class OfferController extends Controller {
 
     this.logger.info('Register routes for OfferController…');
 
+    this.addRoute({path: '/:offerId', method: HttpMethod.Get, handler: this.get});
     this.addRoute({path: '/', method: HttpMethod.Get, handler: this.index});
     this.addRoute({path: '/', method: HttpMethod.Post, handler: this.create});
+
   }
 
   public async index(_req: Request, res: Response): Promise<void> {
@@ -49,5 +56,23 @@ export default class OfferController extends Controller {
       StatusCodes.CREATED,
       fillDTO(OfferDto, offer)
     );
+  }
+
+  public async get(
+    {params}: Request<core.ParamsDictionary | ParamsGetOffer>,
+    res: Response
+  ): Promise<void> {
+    const {offerId} = params;
+    const offer = await this.offerService.findById(offerId);
+
+    if (!offer) {
+      throw new HttpError(
+        StatusCodes.NOT_FOUND,
+        `Offer with id ${offerId} not found.`,
+        'OfferController'
+      );
+    }
+
+    this.ok(res, offer);
   }
 }
