@@ -4,7 +4,7 @@ import {DocumentType, ModelType} from '@typegoose/typegoose/lib/types.js';
 import {LoggerInterface} from '../../common/logger/logger.interface.js';
 import {Component} from '../../types/component.types.js';
 import { CityEntity } from './city.entity.js';
-import CreateCityDto from './dto/city-user.dto.js';
+import CreateCityDto from './dto/create-city.dto.js';
 import { CityServiceInterface } from './city-service.interface.js';
 
 @injectable()

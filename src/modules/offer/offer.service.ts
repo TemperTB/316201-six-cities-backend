@@ -6,6 +6,8 @@ import {Component} from '../../types/component.types.js';
 import { OfferEntity } from './offer.entity.js';
 import CreateOfferDto from './dto/create-offer.dto.js';
 import { OfferServiceInterface } from './offer-service.interface.js';
+import UpdateOfferDto from './dto/update-offer.dto.js';
+import { DEFAULT_OFFER_COUNT, DEFAULT_PREMIUM_OFFER_COUNT } from './offer.constant.js';
 
 @injectable()
 export default class OfferService implements OfferServiceInterface {
@@ -26,9 +28,37 @@ export default class OfferService implements OfferServiceInterface {
     return this.offerModel.findById(id).populate(['userId', 'cityId']).exec();
   }
 
-  public async find(): Promise<DocumentType<OfferEntity>[]> {
-    return this.offerModel.find();
+  public async find(count?: number): Promise<DocumentType<OfferEntity>[]> {
+    const limit = count ?? DEFAULT_OFFER_COUNT;
+    return this.offerModel.find({}, {}, {limit}).populate(['userId', 'cityId']).exec();
   }
 
+  public async deleteById(offerId: string): Promise<DocumentType<OfferEntity> | null> {
+    return this.offerModel
+      .findByIdAndDelete(offerId)
+      .exec();
+  }
+
+  public async updateById(offerId: string, dto: UpdateOfferDto): Promise<DocumentType<OfferEntity> | null> {
+    return this.offerModel
+      .findByIdAndUpdate(offerId, dto, {new: true})
+      .populate(['userId', 'cityId'])
+      .exec();
+  }
+
+  public async findPremium(count?: number): Promise<DocumentType<OfferEntity>[]> {
+    const limit = count ?? DEFAULT_PREMIUM_OFFER_COUNT;
+    return this.offerModel
+      .find({isPremium: true}, {}, {limit})
+      .populate(['userId', 'cityId'])
+      .exec();
+  }
+
+  public async findFavorite(): Promise<DocumentType<OfferEntity>[]> {
+    return this.offerModel
+      .find({isFavorite: true})
+      .populate(['userId', 'cityId'])
+      .exec();
+  }
 
 }
