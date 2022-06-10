@@ -1,14 +1,16 @@
-import {Expose} from 'class-transformer';
-import { City } from '../../../types/cities.type.js';
+import {Expose, Type} from 'class-transformer';
 import { OfferType } from '../../../types/offer-type.enum.js';
-import { User } from '../../../types/user.type.js';
+import CityDto from '../../city/dto/city.dto.js';
+
+import UserDto from '../../user/dto/user.dto.js';
 
 export default class OfferDto {
   @Expose()
   public bedrooms!: number;
 
-  @Expose()
-  public city!: City;
+  @Expose({ name: 'cityId'})
+  @Type(() => CityDto)
+  public city!: CityDto;
 
   @Expose()
   public description!: string;
@@ -16,8 +18,9 @@ export default class OfferDto {
   @Expose()
   public goods!: string[];
 
-  @Expose()
-  public user!: User;
+  @Expose({ name: 'userId'})
+  @Type(() => UserDto)
+  public user!: UserDto;
 
   @Expose()
   public images!: string[];
