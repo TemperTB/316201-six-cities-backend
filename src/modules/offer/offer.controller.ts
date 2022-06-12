@@ -15,6 +15,7 @@ import * as core from 'express-serve-static-core';
 import { ValidateObjectIdMiddleware } from '../../common/middlewares/validate-objectid.middleware.js';
 import UpdateOfferDto from './dto/update-offer.dto.js';
 import {RequestQuery} from '../../types/request-query.type.js';
+import {ValidateDtoMiddleware} from '../../common/middlewares/validate-dto.middleware.js';
 
 type ParamsGetOffer = {
   offerId: string;
@@ -51,7 +52,11 @@ export default class OfferController extends Controller {
       middlewares: [new ValidateObjectIdMiddleware('offerId')]
     });
     this.addRoute({path: '/', method: HttpMethod.Get, handler: this.index});
-    this.addRoute({path: '/', method: HttpMethod.Post, handler: this.create});
+    this.addRoute({
+      path: '/',
+      method: HttpMethod.Post,
+      handler: this.create,
+      middlewares: [new ValidateDtoMiddleware(CreateOfferDto)]});
     this.addRoute({
       path: '/:offerId',
       method: HttpMethod.Delete,
@@ -62,7 +67,7 @@ export default class OfferController extends Controller {
       path: '/:offerId',
       method: HttpMethod.Patch,
       handler: this.update,
-      middlewares: [new ValidateObjectIdMiddleware('offerId')]
+      middlewares: [new ValidateObjectIdMiddleware('offerId'), new ValidateDtoMiddleware(UpdateOfferDto)]
     });
     this.addRoute({
       path: '/favorite/:offerId/:status',

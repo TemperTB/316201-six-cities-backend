@@ -32,6 +32,10 @@ export default class Application {
 
   public registerMiddlewares() {
     this.expressApp.use(express.json());
+    this.expressApp.use(
+      '/upload',
+      express.static(this.config.get('UPLOAD_DIRECTORY'))
+    );
   }
 
   public registerExceptionFilters() {
@@ -41,8 +45,10 @@ export default class Application {
   public async init() {
     this.logger.info('Application initialization…');
     this.logger.info(`Get value from env $PORT: ${this.config.get('PORT')}`);
-    this.logger.info(`Get value from env $SALT: ${this.config.get('SALT')}`);
     this.logger.info(`Get value from env $DB_HOST: ${this.config.get('DB_HOST')}`);
+    this.logger.info(`Get value from env $DB_PORT: ${this.config.get('DB_PORT')}`);
+    this.logger.info(`Get value from env $DB_NAME: ${this.config.get('DB_NAME')}`);
+    this.logger.info(`Get value from env $UPLOAD_DIRECTORY: ${this.config.get('UPLOAD_DIRECTORY')}`);
 
     const uri = getURI(
       this.config.get('DB_USER'),
