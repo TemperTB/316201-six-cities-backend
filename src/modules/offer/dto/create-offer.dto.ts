@@ -1,5 +1,5 @@
 import {OfferType} from '../../../types/offer-type.enum.js';
-import {ArrayMinSize, ArrayMaxSize, IsArray, IsBoolean, IsDateString, IsEnum, IsInt, IsMongoId, IsString, Max, MaxLength, Min, MinLength} from 'class-validator';
+import {ArrayMinSize, ArrayMaxSize, IsArray, IsBoolean, IsDateString, IsEnum, IsInt, IsLatitude, IsLongitude, IsMongoId, IsString, Max, MaxLength, Min, MinLength} from 'class-validator';
 
 
 export default class CreateOfferDto {
@@ -33,10 +33,10 @@ export default class CreateOfferDto {
   @IsBoolean({message: 'Field isFavorite must be boolean'})
   public isPremium!: boolean;
 
-  @IsInt({message: 'LocationLtd must be an integer'})
+  @IsLatitude({message: 'LocationLtd must be an integer'})
   public locationLtd!: number;
 
-  @IsInt({message: 'locationLng must be an integer'})
+  @IsLongitude({message: 'locationLng must be an integer'})
   public locationLng!: number;
 
   @IsInt({message: 'locationZoom must be an integer'})
@@ -56,9 +56,9 @@ export default class CreateOfferDto {
   @Max(100000, {message: 'Maximum price is 100000'})
   public price!: number;
 
-  @IsInt({message: 'Rating must be an integer'})
-  @Min(1, {message: 'Minimum price is 100'})
-  @Max(5, {message: 'Maximum price is 200000'})
+  @IsInt({message: 'Rating must be a number'})
+  @Min(1, {message: 'Minimum rating is 1'})
+  @Max(5, {message: 'Maximum rating is 8'})
   public rating!: number;
 
   @IsString({message: 'title is required'})
