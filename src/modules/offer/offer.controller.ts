@@ -19,6 +19,10 @@ import {ValidateDtoMiddleware} from '../../common/middlewares/validate-dto.middl
 import {CommentServiceInterface} from '../comment/comment-service.interface.js';
 import CommentDto from '../comment/dto/comment.dto.js';
 import {DocumentExistsMiddleware} from '../../common/middlewares/document-exists.middleware.js';
+import { PrivateRouteMiddleware } from '../../common/middlewares/private-route.middleware.js';
+import { FavoriteServiceInterface } from '../favorites/favorite-service.interface.js';
+import FavoriteDto from '../favorites/dto/favorite-offer.dto.js';
+// import { throws } from 'assert';
 
 type ParamsGetOffer = {
   offerId: string;
@@ -27,6 +31,7 @@ type ParamsGetOffer = {
 type ParamsChangeStatus = {
   offerId: string;
   status: number;
+  userId: string;
 }
 
 @injectable()
@@ -34,6 +39,7 @@ export default class OfferController extends Controller {
   constructor(@inject(Component.LoggerInterface) logger: LoggerInterface,
   @inject(Component.OfferServiceInterface) private readonly offerService: OfferServiceInterface,
   @inject(Component.CommentServiceInterface) private readonly commentService: CommentServiceInterface,
+  @inject(Component.FavoriteServiceInterface) private readonly favoriteService: FavoriteServiceInterface,
   ) {
     super(logger);
 
@@ -87,8 +93,10 @@ export default class OfferController extends Controller {
       path: '/favorite/:offerId/:status',
       method: HttpMethod.Patch,
       handler: this.changeFavoriteStatus,
-      middlewares: [new ValidateObjectIdMiddleware('offerId')]
-    });
+      middlewares: [
+        new ValidateObjectIdMiddleware('offerId'),
+        new PrivateRouteMiddleware()
+      ]});
     this.addRoute({
       path: '/:offerId/comments',
       method: HttpMethod.Get,
@@ -168,26 +176,39 @@ export default class OfferController extends Controller {
   }
 
   public async changeFavoriteStatus(
-    {params}: Request<core.ParamsDictionary | ParamsChangeStatus>,
+    req: Request<core.ParamsDictionary | ParamsChangeStatus>,
     res: Response
   ): Promise<void> {
+    const {params} = req;
     const {offerId, status} = params;
-    let updatedOffer;
     if (+status === 1) {
-      updatedOffer = await this.offerService.updateById(params.offerId, {isFavorite: true});
-    } else {
-      updatedOffer = await this.offerService.updateById(params.offerId, {isFavorite: false});
+      const favorite = await this.favoriteService.findByOfferId(offerId, req.user.id);
+      if (favorite) {
+        throw new HttpError(
+          StatusCodes.CONFLICT,
+          `User with id ${req.user.id} already has favorite offer with id ${offerId}.`,
+          'OfferController'
+        );
+      }
+
+      const result = await this.favoriteService.add({offerId, userId : req.user.id});
+      this.ok(res, fillDTO(FavoriteDto, result));
+      // const favorite = await this.favoriteService.findByOfferId(offerId, userId);
+      // let updatedOffer;
+      // if (+status === 1) {
+      //   updatedOffer = await this.offerService.add(params.offerId, {isFavorite: true});
+      // } else {
+      //   updatedOffer = await this.offerService.updateById(params.offerId, {isFavorite: false});
+      // }
+
+    // if (favorite) {
+    //   throw new HttpError(
+    //     StatusCodes.NOT_FOUND,
+    //     `Offer with id ${offerId} not found.`,
+    //     'OfferController'
+    //   );
     }
 
-    if (!updatedOffer) {
-      throw new HttpError(
-        StatusCodes.NOT_FOUND,
-        `Offer with id ${offerId} not found.`,
-        'OfferController'
-      );
-    }
-
-    this.ok(res, fillDTO(OfferDto, updatedOffer));
   }
 
   public async getComments(

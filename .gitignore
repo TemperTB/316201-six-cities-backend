@@ -12,6 +12,7 @@
 coverage
 *.log
 *.env
+queries-local.http
 
 mongodb/
 

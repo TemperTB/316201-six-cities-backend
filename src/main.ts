@@ -26,6 +26,9 @@ import CommentService from './modules/comment/comment.service.js';
 import {CommentServiceInterface} from './modules/comment/comment-service.interface.js';
 import {CommentEntity, CommentModel} from './modules/comment/comment.entity.js';
 import CommentController from './modules/comment/comment.controller.js';
+import { FavoriteServiceInterface } from './modules/favorites/favorite-service.interface.js';
+import { FavoriteEntity, FavoriteModel } from './modules/favorites/favorite.entity.js';
+import FavoriteService from './modules/favorites/favorite.service.js';
 
 const applicationContainer = new Container();
 applicationContainer.bind<Application>(Component.Application).to(Application).inSingletonScope();
@@ -44,6 +47,8 @@ applicationContainer.bind<ControllerInterface>(Component.UserController).to(User
 applicationContainer.bind<CommentServiceInterface>(Component.CommentServiceInterface).to(CommentService).inSingletonScope();
 applicationContainer.bind<ModelType<CommentEntity>>(Component.CommentModel).toConstantValue(CommentModel);
 applicationContainer.bind<ControllerInterface>(Component.CommentController).to(CommentController).inSingletonScope();
+applicationContainer.bind<FavoriteServiceInterface>(Component.FavoriteServiceInterface).to(FavoriteService).inSingletonScope();
+applicationContainer.bind<ModelType<FavoriteEntity>>(Component.FavoriteModel).toConstantValue(FavoriteModel);
 
 
 const application = applicationContainer.get<Application>(Component.Application);
