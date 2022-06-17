@@ -47,7 +47,7 @@ export default class CommentController extends Controller {
         'CommentController'
       );
     }
-
+    console.log(req.user.id);
     const comment = await this.commentService.create({...body, userId: req.user.id});
     await this.offerService.incCommentCount(body.offerId);
     this.created(res, fillDTO(CommentDto, comment));

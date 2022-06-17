@@ -14,21 +14,20 @@ export default class FavoriteService implements FavoriteServiceInterface {
   public async add(dto: AddOfferFavoriteDto): Promise<DocumentType<FavoriteEntity>> {
     console.log(dto);
     const favorite = await this.favoriteModel.create(dto);
-    return favorite.populate('userId');
+    console.log(favorite.populate('offerId'));
+    return favorite.populate('offerId');
   }
 
   public async findByOfferId(offerId: string, userId: string): Promise<DocumentType<FavoriteEntity> | null> {
     return this.favoriteModel.findOne({offerId, userId});
   }
 
-  public async findByUserId(userId: string): Promise<DocumentType<FavoriteEntity>[]> {
-    return this.favoriteModel
-      .find({userId});
+  public async findByUserId(userId: string): Promise<DocumentType<FavoriteEntity>[] | null> {
+    return this.favoriteModel.find({userId}).populate('offerId');
   }
 
-  public async deleteByOfferId(offerId: string): Promise<DocumentType<FavoriteEntity> | null> {
+  public async deleteByOfferId(offerId: string, userId:string): Promise<DocumentType<FavoriteEntity> | null> {
     return this.favoriteModel
-      .findOneAndDelete({offerId})
-      .exec();
+      .findOneAndDelete({offerId, userId}).populate('offerId');
   }
 }

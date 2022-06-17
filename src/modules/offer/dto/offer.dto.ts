@@ -26,9 +26,6 @@ export default class OfferDto {
   public images!: string[];
 
   @Expose()
-  public isFavorite!: boolean;
-
-  @Expose()
   public isPremium!: boolean;
 
   @Expose()

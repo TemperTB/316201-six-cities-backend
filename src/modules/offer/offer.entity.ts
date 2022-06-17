@@ -27,9 +27,6 @@ export class OfferEntity extends TimeStamps {
   public images!: string[];
 
   @prop({required: true})
-  public isFavorite!: boolean;
-
-  @prop({required: true})
   public isPremium!: boolean;
 
   @prop({required: true})

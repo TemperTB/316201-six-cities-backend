@@ -43,7 +43,6 @@ export default class ImportCommand implements CliCommandInterface {
   private salt!: string;
 
   private async saveOffer(offer: Offer) {
-    // const categories = [];
 
     const user = await this.userService.findOrCreate({
       ...offer.user,
@@ -52,11 +51,6 @@ export default class ImportCommand implements CliCommandInterface {
 
     const city = await this.cityService.findOrCreate(offer.city);
 
-
-    // for (const {name} of offer.categories) {
-    //   const existCategory = await this.categoryService.findByCategoryNameOrCreate(name, {name});
-    //   categories.push(existCategory.id);
-    // }
     await this.offerService.create({
       ...offer,
       userId: user.id,

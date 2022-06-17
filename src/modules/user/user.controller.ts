@@ -47,6 +47,16 @@ export default class UserController extends Controller {
         new UploadFileMiddleware(this.configService.get('UPLOAD_DIRECTORY'), 'avatar'),
       ]
     });
+    this.addRoute({
+      path: '/login',
+      method: HttpMethod.Get,
+      handler: this.checkAuthenticate
+    });
+    this.addRoute({
+      path: '/logout',
+      method: HttpMethod.Post,
+      handler: this.logout
+    });
   }
 
   public async create(
@@ -81,7 +91,6 @@ export default class UserController extends Controller {
       );
     }
 
-
     const token = await createJWT(
       JWT_ALGORITM,
       this.configService.get('JWT_SECRET'),
@@ -97,5 +106,18 @@ export default class UserController extends Controller {
     });
   }
 
+  public async checkAuthenticate(req: Request, res: Response) {
+    if (!req.user) {
+      throw new HttpError(
+        StatusCodes.UNAUTHORIZED,
+        'Unauthorized',
+        'PrivateRouteMiddleware'
+      );
+    }
+    this.ok(res, {message: 'user is login'});
+  }
 
+  public async logout(_req: Request, res: Response) {
+    this.noContent(res, {});
+  }
 }
