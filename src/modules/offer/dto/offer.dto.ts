@@ -6,6 +6,9 @@ import UserDto from '../../user/dto/user.dto.js';
 
 export default class OfferDto {
   @Expose()
+  public id!: string;
+
+  @Expose()
   public bedrooms!: number;
 
   @Expose({ name: 'cityId'})

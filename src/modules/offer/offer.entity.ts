@@ -58,11 +58,6 @@ export class OfferEntity extends TimeStamps {
 
   @prop({required: true})
   public type!: string;
-  // @prop({
-  //   type: () => String,
-  //   enum: OfferType
-  // })
-  // public type!: OfferType; //TODO разобраться с вывыбором из enum
 
   @prop({default: 0})
   public commentCount!: number;
