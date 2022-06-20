@@ -28,9 +28,6 @@ export default class CreateOfferDto {
   public images!: string[];
 
   @IsBoolean({message: 'Field isFavorite must be boolean'})
-  public isFavorite!: boolean;
-
-  @IsBoolean({message: 'Field isFavorite must be boolean'})
   public isPremium!: boolean;
 
   @IsLatitude({message: 'LocationLtd must be an integer'})

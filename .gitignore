@@ -12,6 +12,8 @@
 coverage
 *.log
 *.env
+queries-local.http
+cli-help.md
 
 mongodb/
 

@@ -42,9 +42,6 @@ export default class UpdateOfferDto {
   @ArrayMaxSize(6, {message: 'Images length must be 6'})
   public images?: string[];
 
-  @IsOptional()
-  @IsBoolean({message: 'Field isFavorite must be boolean'})
-  public isFavorite?: boolean;
 
   @IsOptional()
   @IsBoolean({message: 'Field isFavorite must be boolean'})

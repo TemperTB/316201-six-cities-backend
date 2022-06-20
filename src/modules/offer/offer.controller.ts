@@ -19,6 +19,10 @@ import {ValidateDtoMiddleware} from '../../common/middlewares/validate-dto.middl
 import {CommentServiceInterface} from '../comment/comment-service.interface.js';
 import CommentDto from '../comment/dto/comment.dto.js';
 import {DocumentExistsMiddleware} from '../../common/middlewares/document-exists.middleware.js';
+import { PrivateRouteMiddleware } from '../../common/middlewares/private-route.middleware.js';
+import { FavoriteServiceInterface } from '../favorites/favorite-service.interface.js';
+import FavoriteOfferDto from '../favorites/dto/favorite-offer.dto.js';
+// import { throws } from 'assert';
 
 type ParamsGetOffer = {
   offerId: string;
@@ -27,6 +31,7 @@ type ParamsGetOffer = {
 type ParamsChangeStatus = {
   offerId: string;
   status: number;
+  userId: string;
 }
 
 @injectable()
@@ -34,6 +39,7 @@ export default class OfferController extends Controller {
   constructor(@inject(Component.LoggerInterface) logger: LoggerInterface,
   @inject(Component.OfferServiceInterface) private readonly offerService: OfferServiceInterface,
   @inject(Component.CommentServiceInterface) private readonly commentService: CommentServiceInterface,
+  @inject(Component.FavoriteServiceInterface) private readonly favoriteService: FavoriteServiceInterface,
   ) {
     super(logger);
 
@@ -81,14 +87,17 @@ export default class OfferController extends Controller {
         new ValidateObjectIdMiddleware('offerId'),
         new ValidateDtoMiddleware(UpdateOfferDto),
         new DocumentExistsMiddleware(this.offerService, 'Offer', 'offerId'),
+        new PrivateRouteMiddleware(),
       ]
     });
     this.addRoute({
       path: '/favorite/:offerId/:status',
       method: HttpMethod.Patch,
       handler: this.changeFavoriteStatus,
-      middlewares: [new ValidateObjectIdMiddleware('offerId')]
-    });
+      middlewares: [
+        new ValidateObjectIdMiddleware('offerId'),
+        new PrivateRouteMiddleware()
+      ]});
     this.addRoute({
       path: '/:offerId/comments',
       method: HttpMethod.Get,
@@ -102,10 +111,26 @@ export default class OfferController extends Controller {
 
   }
 
-  public async index({query}: Request<core.ParamsDictionary, unknown, unknown, RequestQuery>, res: Response): Promise<void> {
-    const offers = await this.offerService.find(query.limit);
-    const offersDTO = fillDTO(OfferDto, offers);
-    this.send(res, StatusCodes.OK, offersDTO);
+  public async index(req: Request<core.ParamsDictionary, unknown, unknown, RequestQuery>, res: Response): Promise<void> {
+    const {limit} = req.query;
+    let userId;
+    if (!req.user) {
+      userId = '00000000000000000000000a';
+    } else {
+      userId = req.user.id;
+    }
+    const offers = await this.offerService.find(limit);
+    const offersForResult: any = fillDTO(OfferDto, offers);
+    let finalOffers: any = [];
+    for (const offer of offersForResult) {
+      const favoriteFlag = await this.favoriteService.findByOfferId(offer.id, userId);
+      if (favoriteFlag) {
+        finalOffers = [...finalOffers, {...offer, isFavorite: true}];
+      } else {
+        finalOffers = [...finalOffers, {...offer, isFavorite: false}];
+      }
+    }
+    this.ok(res, finalOffers);
   }
 
   public async create(
@@ -123,13 +148,26 @@ export default class OfferController extends Controller {
   }
 
   public async get(
-    {params}: Request<core.ParamsDictionary | ParamsGetOffer>,
+    req: Request<core.ParamsDictionary | ParamsGetOffer>,
     res: Response
   ): Promise<void> {
-    const {offerId} = params;
+    const {offerId} = req.params;
+    let userId;
+    if (!req.user) {
+      userId = '00000000000000000000000a';
+    } else {
+      userId = req.user.id;
+    }
     const offer = await this.offerService.findById(offerId);
-
-    this.ok(res, fillDTO(OfferDto, offer));
+    const offerForResult = fillDTO(OfferDto, offer);
+    const favoriteFlag = await this.favoriteService.findByOfferId(offerId, userId);
+    if (favoriteFlag) {
+      const result = {...offerForResult, isFavorite: true};
+      this.ok(res, result);
+    } else {
+      const result = {...offerForResult, isFavorite: false};
+      this.ok(res, result);
+    }
   }
 
   public async delete(
@@ -143,51 +181,104 @@ export default class OfferController extends Controller {
   }
 
   public async update(
-    {body, params}: Request<core.ParamsDictionary | ParamsGetOffer, Record<string, unknown>, UpdateOfferDto>,
+    req: Request<core.ParamsDictionary | ParamsGetOffer, Record<string, unknown>, UpdateOfferDto>,
     res: Response
   ): Promise<void> {
-    const updatedOffer = await this.offerService.updateById(params.offerId, body);
-
-    this.ok(res, fillDTO(OfferDto, updatedOffer));
+    const offerId = req.params.offerId;
+    const userId = req.user.id;
+    const body = req.body;
+    const updatedOffer = await this.offerService.updateById(offerId, body);
+    const updatedOfferForResult = fillDTO(OfferDto, updatedOffer);
+    const favoriteFlag = await this.favoriteService.findByOfferId(offerId, userId);
+    if (favoriteFlag) {
+      const result = {...updatedOfferForResult, isFavorite: true};
+      this.ok(res, result);
+    } else {
+      const result = {...updatedOfferForResult, isFavorite: false};
+      this.ok(res, result);
+    }
   }
 
   public async getPremiumOffers(
-    {query}: Request<core.ParamsDictionary, unknown, unknown, RequestQuery>,
+    req: Request<core.ParamsDictionary, unknown, unknown, RequestQuery>,
     res: Response
   ):Promise<void> {
-    const offers = await this.offerService.findPremium(query.limit);
-    this.ok(res, fillDTO(OfferDto, offers));
+    const {limit} = req.query;
+    let userId;
+    if (!req.user) {
+      userId = '00000000000000000000000a';
+    } else {
+      userId = req.user.id;
+    }
+    const offers = await this.offerService.findPremium(limit);
+    const offersForResult: any = fillDTO(OfferDto, offers);
+    let finalOffers: any = [];
+    for (const offer of offersForResult) {
+      const favoriteFlag = await this.favoriteService.findByOfferId(offer.id, userId);
+      if (favoriteFlag) {
+        finalOffers = [...finalOffers, {...offer, isFavorite: true}];
+      } else {
+        finalOffers = [...finalOffers, {...offer, isFavorite: false}];
+      }
+    }
+    this.ok(res, finalOffers);
   }
 
   public async getFavoriteOffers(
-    _req: Request,
+    req: Request,
     res: Response
   ):Promise<void> {
-    const offers = await this.offerService.findFavorite();
-    this.ok(res, fillDTO(OfferDto, offers));
+    const offers = await this.favoriteService.findByUserId(req.user.id);
+    const offersAfterFillDTO: any = fillDTO(FavoriteOfferDto, offers);
+    const result = offersAfterFillDTO.map((item: FavoriteOfferDto) => ({...item.offer, isFavorite: true}));
+    if (result.length === 0) {
+      this.ok(res, {message: 'No favorite offers'});
+    } else {
+      this.ok(res, result);
+    }
+
   }
 
   public async changeFavoriteStatus(
-    {params}: Request<core.ParamsDictionary | ParamsChangeStatus>,
+    req: Request<core.ParamsDictionary | ParamsChangeStatus>,
     res: Response
   ): Promise<void> {
+    const {params} = req;
     const {offerId, status} = params;
-    let updatedOffer;
-    if (+status === 1) {
-      updatedOffer = await this.offerService.updateById(params.offerId, {isFavorite: true});
-    } else {
-      updatedOffer = await this.offerService.updateById(params.offerId, {isFavorite: false});
+    const userId = req.user.id;
+    const favorite = await this.favoriteService.findByOfferId(offerId, userId);
+    switch (+status) {
+      case 1: {
+        if (favorite) {
+          throw new HttpError(
+            StatusCodes.CONFLICT,
+            `User with id ${userId} already has favorite offer with id ${offerId}.`,
+            'OfferController'
+          );
+        }
+        const dataFromMongo = await this.favoriteService.add({offerId, userId});
+        const viewForResult = fillDTO(FavoriteOfferDto, dataFromMongo);
+        const result = {...viewForResult.offer, isFavorite: true};
+        this.ok(res, result);
+        break;
+      }
+      case 0: {
+        if (!favorite) {
+          throw new HttpError(
+            StatusCodes.CONFLICT,
+            `User with id ${userId} has not favorite offer with id ${offerId}.`,
+            'OfferController'
+          );
+        }
+        const dataFromMongo = await this.favoriteService.deleteByOfferId(offerId, userId);
+        const viewForResult = fillDTO(FavoriteOfferDto, dataFromMongo);
+        const result = {...viewForResult.offer, isFavorite: false};
+        this.ok(res, result);
+        break;
+      }
+      default:
+        break;
     }
-
-    if (!updatedOffer) {
-      throw new HttpError(
-        StatusCodes.NOT_FOUND,
-        `Offer with id ${offerId} not found.`,
-        'OfferController'
-      );
-    }
-
-    this.ok(res, fillDTO(OfferDto, updatedOffer));
   }
 
   public async getComments(

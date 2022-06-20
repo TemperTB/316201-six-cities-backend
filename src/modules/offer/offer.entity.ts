@@ -27,9 +27,6 @@ export class OfferEntity extends TimeStamps {
   public images!: string[];
 
   @prop({required: true})
-  public isFavorite!: boolean;
-
-  @prop({required: true})
   public isPremium!: boolean;
 
   @prop({required: true})
@@ -61,11 +58,6 @@ export class OfferEntity extends TimeStamps {
 
   @prop({required: true})
   public type!: string;
-  // @prop({
-  //   type: () => String,
-  //   enum: OfferType
-  // })
-  // public type!: OfferType; //TODO разобраться с вывыбором из enum
 
   @prop({default: 0})
   public commentCount!: number;

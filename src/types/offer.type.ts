@@ -9,7 +9,6 @@ export type Offer = {
   goods: string[];
   user: User;
   images: string[];
-  isFavorite: boolean;
   isPremium: boolean;
   locationLtd: number;
   locationLng: number;

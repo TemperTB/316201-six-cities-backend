@@ -13,8 +13,6 @@ const MIN_ADULTS_COUNT = 1;
 const MAX_ADULTS_COUNT = 10;
 const MIN_RATING = 1;
 const MAX_RATING = 5;
-const MIN_COMMENTS_COUNT = 0;
-const MAX_COMMENTS_COUNT = 10;
 const FIRST_WEEK_DAY = 1;
 const LAST_WEEK_DAY = 7;
 const nanoid = customAlphabet('1234567890', 10);
@@ -47,18 +45,17 @@ export default class OfferGenerator implements OfferGeneratorInterface {
       password: getRandomItem<string>(this.mockData.passwords),
     };
     const userString = Object.values(user).join(';');
-    const commentCount = generateRandomValue(MIN_COMMENTS_COUNT, MAX_COMMENTS_COUNT, 0);
+    const commentCount = 0;
     const locationLtd = generateRandomValue(1, 1 + 0.01, 6);
     const locationLng = generateRandomValue(1, 1 + 0.01, 6);
     const locationZoom = city.zoom;
-    const isFavorite = generateRandomValue(0, 1);
 
     return [
       id, title,
       description, createdDate, cityString, previewImage,
       imagesString, isPremium, rating, type, bedrooms, maxAdults,
       price, goodsString, userString, commentCount, locationLtd,
-      locationLng, locationZoom, isFavorite,
+      locationLng, locationZoom,
     ].join('\t');
   }
 }
