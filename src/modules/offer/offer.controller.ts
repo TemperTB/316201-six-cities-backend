@@ -22,7 +22,10 @@ import {DocumentExistsMiddleware} from '../../common/middlewares/document-exists
 import { PrivateRouteMiddleware } from '../../common/middlewares/private-route.middleware.js';
 import { FavoriteServiceInterface } from '../favorites/favorite-service.interface.js';
 import FavoriteOfferDto from '../favorites/dto/favorite-offer.dto.js';
-// import { throws } from 'assert';
+import { ConfigInterface } from '../../common/config/config.interface.js';
+import { UploadFileMiddleware } from '../../common/middlewares/upload-file.middleware.js';
+import UploadImageDto from './dto/upload-image.dto.js';
+import { CheckOwnerMiddleware } from '../../common/middlewares/check-owner.middleware.js';
 
 type ParamsGetOffer = {
   offerId: string;
@@ -40,8 +43,9 @@ export default class OfferController extends Controller {
   @inject(Component.OfferServiceInterface) private readonly offerService: OfferServiceInterface,
   @inject(Component.CommentServiceInterface) private readonly commentService: CommentServiceInterface,
   @inject(Component.FavoriteServiceInterface) private readonly favoriteService: FavoriteServiceInterface,
+  @inject(Component.ConfigInterface) configService: ConfigInterface,
   ) {
-    super(logger);
+    super(logger, configService);
 
     this.logger.info('Register routes for OfferController…');
 
@@ -54,6 +58,9 @@ export default class OfferController extends Controller {
       path: '/favorite',
       method: HttpMethod.Get,
       handler: this.getFavoriteOffers,
+      middlewares: [
+        new PrivateRouteMiddleware()
+      ]
     });
     this.addRoute({
       path: '/:offerId',
@@ -69,7 +76,21 @@ export default class OfferController extends Controller {
       path: '/',
       method: HttpMethod.Post,
       handler: this.create,
-      middlewares: [new ValidateDtoMiddleware(CreateOfferDto)]});
+      middlewares: [
+        new ValidateDtoMiddleware(CreateOfferDto),
+        new PrivateRouteMiddleware(),
+      ]});
+    this.addRoute({
+      path: '/:offerId/image',
+      method: HttpMethod.Post,
+      handler: this.uploadImage,
+      middlewares: [
+        new PrivateRouteMiddleware(),
+        new ValidateObjectIdMiddleware('offerId'),
+        new UploadFileMiddleware(this.configService.get('UPLOAD_DIRECTORY'), 'image'),
+        new CheckOwnerMiddleware(this.offerService, 'offerId')
+      ]
+    });
     this.addRoute({
       path: '/:offerId',
       method: HttpMethod.Delete,
@@ -77,6 +98,8 @@ export default class OfferController extends Controller {
       middlewares: [
         new ValidateObjectIdMiddleware('offerId'),
         new DocumentExistsMiddleware(this.offerService, 'Offer', 'offerId'),
+        new PrivateRouteMiddleware(),
+        new CheckOwnerMiddleware(this.offerService, 'offerId')
       ]
     });
     this.addRoute({
@@ -88,6 +111,7 @@ export default class OfferController extends Controller {
         new ValidateDtoMiddleware(UpdateOfferDto),
         new DocumentExistsMiddleware(this.offerService, 'Offer', 'offerId'),
         new PrivateRouteMiddleware(),
+        new CheckOwnerMiddleware(this.offerService, 'offerId')
       ]
     });
     this.addRoute({
@@ -95,6 +119,7 @@ export default class OfferController extends Controller {
       method: HttpMethod.Patch,
       handler: this.changeFavoriteStatus,
       middlewares: [
+        new DocumentExistsMiddleware(this.offerService, 'Offer', 'offerId'),
         new ValidateObjectIdMiddleware('offerId'),
         new PrivateRouteMiddleware()
       ]});
@@ -134,10 +159,11 @@ export default class OfferController extends Controller {
   }
 
   public async create(
-    {body}: Request<Record<string, unknown>, Record<string, unknown>, CreateOfferDto>,
+    req: Request<Record<string, unknown>, Record<string, unknown>, CreateOfferDto>,
     res: Response): Promise<void> {
 
-    const result = await this.offerService.create(body);
+    const {body, user} = req;
+    const result = await this.offerService.create({...body, userId: user.id});
     const offer = await this.offerService.findById(result.id);
 
     this.send(
@@ -176,7 +202,7 @@ export default class OfferController extends Controller {
   ): Promise<void> {
     const {offerId} = params;
     const offer = await this.offerService.deleteById(offerId);
-
+    await this.commentService.deleteByOfferId(offerId);
     this.noContent(res, offer);
   }
 
@@ -288,5 +314,12 @@ export default class OfferController extends Controller {
 
     const comments = await this.commentService.findByOfferId(params.offerId);
     this.ok(res, fillDTO(CommentDto, comments));
+  }
+
+  public async uploadImage(req: Request<core.ParamsDictionary | ParamsGetOffer>, res: Response) {
+    const {offerId} = req.params;
+    const updateDto = { previewImage: req.file?.filename };
+    await this.offerService.updateById(offerId, updateDto);
+    this.created(res, fillDTO(UploadImageDto, updateDto));
   }
 }

@@ -8,6 +8,7 @@ import CreateOfferDto from './dto/create-offer.dto.js';
 import { OfferServiceInterface } from './offer-service.interface.js';
 import UpdateOfferDto from './dto/update-offer.dto.js';
 import { DEFAULT_OFFER_COUNT, DEFAULT_PREMIUM_OFFER_COUNT } from './offer.constant.js';
+import { SortType } from '../../types/sort-type.enum.js';
 
 @injectable()
 export default class OfferService implements OfferServiceInterface {
@@ -30,7 +31,7 @@ export default class OfferService implements OfferServiceInterface {
 
   public async find(count?: number): Promise<DocumentType<OfferEntity>[]> {
     const limit = count ?? DEFAULT_OFFER_COUNT;
-    return this.offerModel.find({}, {}, {limit}).populate(['userId', 'cityId']).exec();
+    return this.offerModel.find({}, {}, {limit}).sort({createdAt: SortType.Down}).populate(['userId', 'cityId']).exec();
   }
 
   public async deleteById(offerId: string): Promise<DocumentType<OfferEntity> | null> {
@@ -50,6 +51,7 @@ export default class OfferService implements OfferServiceInterface {
     const limit = count ?? DEFAULT_PREMIUM_OFFER_COUNT;
     return this.offerModel
       .find({isPremium: true}, {}, {limit})
+      .sort({createdAt: SortType.Down})
       .populate(['userId', 'cityId'])
       .exec();
   }
@@ -57,13 +59,13 @@ export default class OfferService implements OfferServiceInterface {
   public async findFavorite(): Promise<DocumentType<OfferEntity>[]> {
     return this.offerModel
       .find({isFavorite: true})
+      .sort({createdAt: SortType.Down})
       .populate(['userId', 'cityId'])
       .exec();
   }
 
   public async exists(documentId: string): Promise<boolean> {
-    return (await this.offerModel
-      .exists({_id: documentId})) !== null;
+    return (await this.offerModel.exists({_id: documentId})) !== null;
   }
 
   public async incCommentCount(offerId: string): Promise<DocumentType<OfferEntity> | null> {
@@ -73,4 +75,7 @@ export default class OfferService implements OfferServiceInterface {
       }}).exec();
   }
 
+  public async isOwner(userId: string, documentId: string): Promise<boolean> {
+    return (await this.offerModel.exists({_id: documentId, userId: userId}) !== null);
+  }
 }

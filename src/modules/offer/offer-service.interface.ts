@@ -3,8 +3,9 @@ import CreateOfferDto from './dto/create-offer.dto';
 import UpdateOfferDto from './dto/update-offer.dto';
 import { OfferEntity } from './offer.entity';
 import {DocumentExistsInterface} from '../../types/document-exists.interface.js';
+import { CheckOwnerInterface } from '../../types/my-offer.interface';
 
-export interface OfferServiceInterface extends DocumentExistsInterface {
+export interface OfferServiceInterface extends DocumentExistsInterface, CheckOwnerInterface {
   create(dto: CreateOfferDto): Promise<DocumentType<OfferEntity>>;
   findById(id: string): Promise<DocumentType<OfferEntity> | null>;
   find(count?: number): Promise<DocumentType<OfferEntity>[]>;
