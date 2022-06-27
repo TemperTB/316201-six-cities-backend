@@ -9,7 +9,6 @@ import {UserServiceInterface} from './user-service.interface.js';
 import HttpError from '../../common/errors/http-error.js';
 import {StatusCodes} from 'http-status-codes';
 import {createJWT, fillDTO} from '../../utils/common.js';
-import UserDto from './dto/user.dto.js';
 import {ConfigInterface} from '../../common/config/config.interface.js';
 import LoginUserDto from './dto/login-user.dto.js';
 import { ValidateDtoMiddleware } from '../../common/middlewares/validate-dto.middleware.js';
@@ -17,6 +16,9 @@ import { UploadFileMiddleware } from '../../common/middlewares/upload-file.middl
 import { ValidateObjectIdMiddleware } from '../../common/middlewares/validate-objectid.middleware.js';
 import LoggedUserDto from './dto/logged-user.dto.js';
 import {JWT_ALGORITM} from './user.constant.js';
+import CreatedUserDto from './dto/created-user.dto.js';
+import UploadUserAvatarDto from './dto/upload-user-avatar.dto.js';
+import { PrivateRouteMiddleware } from '../../common/middlewares/private-route.middleware.js';
 
 
 @injectable()
@@ -24,9 +26,9 @@ export default class UserController extends Controller {
   constructor(
     @inject(Component.LoggerInterface) logger: LoggerInterface,
     @inject(Component.UserServiceInterface) private readonly userService: UserServiceInterface,
-    @inject(Component.ConfigInterface) private readonly configService: ConfigInterface,
+    @inject(Component.ConfigInterface) configService: ConfigInterface,
   ) {
-    super(logger);
+    super(logger, configService);
     this.logger.info('Register routes for UserController…');
     this.addRoute({
       path: '/register',
@@ -43,6 +45,7 @@ export default class UserController extends Controller {
       method: HttpMethod.Post,
       handler: this.uploadAvatar,
       middlewares: [
+        new PrivateRouteMiddleware(),
         new ValidateObjectIdMiddleware('userId'),
         new UploadFileMiddleware(this.configService.get('UPLOAD_DIRECTORY'), 'avatar'),
       ]
@@ -74,7 +77,7 @@ export default class UserController extends Controller {
     }
 
     const result = await this.userService.create(body, this.configService.get('SALT'));
-    this.created(res, fillDTO(UserDto, result));
+    this.created(res, fillDTO(CreatedUserDto, result));
   }
 
   public async login(
@@ -97,13 +100,15 @@ export default class UserController extends Controller {
       { email: user.email, id: user.id}
     );
 
-    this.ok(res, fillDTO(LoggedUserDto, {email: user.email, token}));
+    const loggedUserDto = fillDTO(LoggedUserDto, user);
+    this.ok(res, {...loggedUserDto, token});
   }
 
   public async uploadAvatar(req: Request, res: Response) {
-    this.created(res, {
-      filepath: req.file?.path
-    });
+    const {userId} = req.params;
+    const uploadFile = {avatarUrl: req.file?.filename};
+    await this.userService.updateById(userId, uploadFile);
+    this.created(res, fillDTO(UploadUserAvatarDto, uploadFile));
   }
 
   public async checkAuthenticate(req: Request, res: Response) {

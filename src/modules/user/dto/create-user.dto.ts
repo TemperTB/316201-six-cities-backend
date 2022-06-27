@@ -4,8 +4,6 @@ export default class CreateUserDto {
   @IsEmail({}, {message: 'email must be valid address'})
   public email!: string ;
 
-  public avatarUrl!: string;
-
   @IsBoolean({message: 'isPro must be boolean'})
   public isPro!: boolean;
 

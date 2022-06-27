@@ -41,7 +41,7 @@ export class OfferEntity extends TimeStamps {
   @prop({required: true})
   public maxAdults!: number;
 
-  @prop({required: true, default: 'apartment-01.jpg'})
+  @prop({default: ''})
   public previewImage!: string;
 
   @prop({required: true})

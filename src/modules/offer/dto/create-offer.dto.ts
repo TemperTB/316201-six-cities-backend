@@ -19,7 +19,6 @@ export default class CreateOfferDto {
   @IsArray({message: 'Field goods must be an array'})
   public goods!: string[];
 
-  @IsMongoId({message: 'userId field must be valid an identificator'})
   public userId!: string;
 
   @IsArray({message: 'Field images must be an array'})
@@ -43,10 +42,6 @@ export default class CreateOfferDto {
   @Min(1, {message: 'Minimum maxAdults is 1'})
   @Max(10, {message: 'Maximum maxAdults is 10'})
   public maxAdults!: number;
-
-  @IsString({message: 'previewImage is required'})
-  @MaxLength(256, {message: 'Too short for field «image»'})
-  public previewImage!: string;
 
   @IsInt({message: 'Price must be an integer'})
   @Min(100, {message: 'Minimum price is 100'})
