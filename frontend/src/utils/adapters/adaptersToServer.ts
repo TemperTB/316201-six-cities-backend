@@ -44,5 +44,12 @@ export const adaptOfferToServer =
     title: offer.title,
     type: offer.type,
     postDate: getTime(),
-    previewImage: offer.previewImage,
+    previewImage: 'http://localhost:3000/static/default-preview-image-1.jpg',
+    images: [
+      'http://localhost:3000/static/default-preview-image-1.jpg',
+      'http://localhost:3000/static/default-preview-image-2.jpg',
+      'http://localhost:3000/static/default-preview-image-3.jpg',
+      'http://localhost:3000/static/default-preview-image-1.jpg',
+      'http://localhost:3000/static/default-preview-image-2.jpg',
+      'http://localhost:3000/static/default-preview-image-3.jpg'],
   });

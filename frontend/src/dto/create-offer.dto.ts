@@ -6,6 +6,7 @@ export default class CreateOfferDto {
   public city!: City;
   public description!: string;
   public goods!: string[];
+  public images!: string[];
   public isPremium!: boolean;
   public locationLtd!: number;
   public locationLng!: number;

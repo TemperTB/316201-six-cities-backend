@@ -31,13 +31,7 @@ export const adaptOfferToClient = (offer: OfferDto): Offer => ({
   goods: offer.goods,
   host: adaptUserToClient(offer.user),
   id: offer.id,
-  images: [
-    'http://123.ru/1.jpg',
-    'http://123.ru/1.jpg',
-    'http://123.ru/1.jpg',
-    'http://123.ru/1.jpg',
-    'http://123.ru/1.jpg',
-    'http://123.ru/1.jpg'],
+  images: offer.images,
   isFavorite: offer.isFavorite,
   isPremium: offer.isPremium,
   location: {
