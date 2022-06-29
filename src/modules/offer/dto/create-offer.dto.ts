@@ -21,6 +21,9 @@ export default class CreateOfferDto {
 
   public userId!: string;
 
+  @IsArray({message: 'Field images must be an array'})
+  public images!: string[];
+
   @IsBoolean({message: 'Field isFavorite must be boolean'})
   public isPremium!: boolean;
 
