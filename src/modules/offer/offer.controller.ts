@@ -26,6 +26,8 @@ import { ConfigInterface } from '../../common/config/config.interface.js';
 import { UploadFileMiddleware } from '../../common/middlewares/upload-file.middleware.js';
 import UploadImageDto from './dto/upload-image.dto.js';
 import { CheckOwnerMiddleware } from '../../common/middlewares/check-owner.middleware.js';
+import { CityServiceInterface } from '../city/city-service.interface.js';
+import CityDto from '../city/dto/city.dto.js';
 
 type ParamsGetOffer = {
   offerId: string;
@@ -41,6 +43,7 @@ type ParamsChangeStatus = {
 export default class OfferController extends Controller {
   constructor(@inject(Component.LoggerInterface) logger: LoggerInterface,
   @inject(Component.OfferServiceInterface) private readonly offerService: OfferServiceInterface,
+  @inject(Component.CityServiceInterface) private readonly cityService: CityServiceInterface,
   @inject(Component.CommentServiceInterface) private readonly commentService: CommentServiceInterface,
   @inject(Component.FavoriteServiceInterface) private readonly favoriteService: FavoriteServiceInterface,
   @inject(Component.ConfigInterface) configService: ConfigInterface,
@@ -163,7 +166,9 @@ export default class OfferController extends Controller {
     res: Response): Promise<void> {
 
     const {body, user} = req;
-    const result = await this.offerService.create({...body, userId: user.id});
+    const city = await this.cityService.findOrCreate(body.city);
+    const cityDto = fillDTO(CityDto, city);
+    const result = await this.offerService.create({...body, userId: user.id, cityId: cityDto.id});
     const offer = await this.offerService.findById(result.id);
 
     this.send(

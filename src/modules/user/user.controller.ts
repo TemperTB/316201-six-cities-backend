@@ -18,8 +18,6 @@ import LoggedUserDto from './dto/logged-user.dto.js';
 import {JWT_ALGORITM} from './user.constant.js';
 import CreatedUserDto from './dto/created-user.dto.js';
 import UploadUserAvatarDto from './dto/upload-user-avatar.dto.js';
-import { PrivateRouteMiddleware } from '../../common/middlewares/private-route.middleware.js';
-
 
 @injectable()
 export default class UserController extends Controller {
@@ -45,7 +43,6 @@ export default class UserController extends Controller {
       method: HttpMethod.Post,
       handler: this.uploadAvatar,
       middlewares: [
-        new PrivateRouteMiddleware(),
         new ValidateObjectIdMiddleware('userId'),
         new UploadFileMiddleware(this.configService.get('UPLOAD_DIRECTORY'), 'avatar'),
       ]
@@ -57,7 +54,7 @@ export default class UserController extends Controller {
     });
     this.addRoute({
       path: '/logout',
-      method: HttpMethod.Post,
+      method: HttpMethod.Delete,
       handler: this.logout
     });
   }
@@ -119,7 +116,8 @@ export default class UserController extends Controller {
         'PrivateRouteMiddleware'
       );
     }
-    this.ok(res, {message: 'user is login'});
+    const user = await this.userService.findByEmail(req.user.email);
+    this.ok(res, fillDTO(LoggedUserDto, user));
   }
 
   public async logout(_req: Request, res: Response) {
