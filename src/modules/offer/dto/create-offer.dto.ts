@@ -1,5 +1,6 @@
 import {OfferType} from '../../../types/offer-type.enum.js';
-import {ArrayMinSize, ArrayMaxSize, IsArray, IsBoolean, IsDateString, IsEnum, IsInt, IsLatitude, IsLongitude, IsMongoId, IsString, Max, MaxLength, Min, MinLength} from 'class-validator';
+import {IsArray, IsBoolean, IsDateString, IsEnum, IsInt, IsLatitude, IsLongitude, IsString, Max, MaxLength, Min, MinLength} from 'class-validator';
+import { City } from '../../../types/cities.type.js';
 
 
 export default class CreateOfferDto {
@@ -8,8 +9,7 @@ export default class CreateOfferDto {
   @Max(8, {message: 'Maximum bedrooms is 8'})
   public bedrooms!: number;
 
-  @IsMongoId({message: 'cityId field must be valid an identificator'})
-  public cityId!: string;
+  public city!: City;
 
   @IsString({message: 'description is required'})
   @MinLength(20, {message: 'Minimum description length must be 20'})
@@ -22,8 +22,6 @@ export default class CreateOfferDto {
   public userId!: string;
 
   @IsArray({message: 'Field images must be an array'})
-  @ArrayMinSize(6, {message: 'Images length must be 6'})
-  @ArrayMaxSize(6, {message: 'Images length must be 6'})
   public images!: string[];
 
   @IsBoolean({message: 'Field isFavorite must be boolean'})
@@ -62,7 +60,7 @@ export default class CreateOfferDto {
   public type!: OfferType;
 
   @IsDateString({}, {message: 'postDate must be valid ISO date'})
-  public postDate!: Date;
+  public postDate!: string;
 
   public commentCount!: number;
 }

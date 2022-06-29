@@ -12,4 +12,8 @@ export default class LoggedUserDto {
 
   @Expose()
   public name!: string;
+
+
+  @Expose()
+  public isPro!: boolean;
 }

@@ -14,6 +14,11 @@ import {fillDTO} from '../../utils/common.js';
 import CommentDto from './dto/comment.dto.js';
 import {ConfigInterface} from '../../common/config/config.interface.js';
 import { PrivateRouteMiddleware } from '../../common/middlewares/private-route.middleware.js';
+import * as core from 'express-serve-static-core';
+
+type ParamsGetOffer = {
+  offerId: string;
+}
 
 export default class CommentController extends Controller {
   constructor(
@@ -26,7 +31,7 @@ export default class CommentController extends Controller {
 
     this.logger.info('Register routes for CommentController…');
     this.addRoute({
-      path: '/',
+      path: '/:offerId',
       method: HttpMethod.Post,
       handler: this.create,
       middlewares: [
@@ -37,21 +42,21 @@ export default class CommentController extends Controller {
   }
 
   public async create(
-    req: Request<object, object, CreateCommentDto>,
+    req: Request<core.ParamsDictionary | ParamsGetOffer, Record<string, unknown>, CreateCommentDto>,
     res: Response
   ): Promise<void> {
-
+    const {offerId} = req.params;
     const {body} = req;
-    if (!await this.offerService.exists(body.offerId)) {
+    if (!await this.offerService.exists(offerId)) {
       throw new HttpError(
         StatusCodes.NOT_FOUND,
-        `Offer with id ${body.offerId} not found.`,
+        `Offer with id ${offerId} not found.`,
         'CommentController'
       );
     }
-    console.log(req.user.id);
-    const comment = await this.commentService.create({...body, userId: req.user.id});
-    await this.offerService.incCommentCount(body.offerId);
+    const comment = await this.commentService.create({...body, userId: req.user.id, offerId: offerId});
+    await this.offerService.incCommentCount(offerId);
     this.created(res, fillDTO(CommentDto, comment));
   }
 }
+

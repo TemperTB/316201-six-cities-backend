@@ -4,11 +4,11 @@ import {DocumentType, ModelType} from '@typegoose/typegoose/lib/types.js';
 import {LoggerInterface} from '../../common/logger/logger.interface.js';
 import {Component} from '../../types/component.types.js';
 import { OfferEntity } from './offer.entity.js';
-import CreateOfferDto from './dto/create-offer.dto.js';
 import { OfferServiceInterface } from './offer-service.interface.js';
 import UpdateOfferDto from './dto/update-offer.dto.js';
 import { DEFAULT_OFFER_COUNT, DEFAULT_PREMIUM_OFFER_COUNT } from './offer.constant.js';
 import { SortType } from '../../types/sort-type.enum.js';
+import NewOfferDto from './dto/new-offer.dto.js';
 
 @injectable()
 export default class OfferService implements OfferServiceInterface {
@@ -17,7 +17,7 @@ export default class OfferService implements OfferServiceInterface {
     @inject(Component.OfferModel) private readonly offerModel: ModelType<OfferEntity>
   ) {}
 
-  public async create(dto: CreateOfferDto): Promise<DocumentType<OfferEntity>> {
+  public async create(dto: NewOfferDto): Promise<DocumentType<OfferEntity>> {
 
     const result = await this.offerModel.create(dto);
     this.logger.info(`New offer created: ${dto.title}`);

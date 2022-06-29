@@ -59,7 +59,7 @@ export default class OfferDto {
   public type!: OfferType;
 
   @Expose()
-  public postDate!: Date;
+  public postDate!: string;
 
   @Expose()
   public commentCount!: number;
