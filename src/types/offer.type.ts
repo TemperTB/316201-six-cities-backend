@@ -19,6 +19,6 @@ export type Offer = {
   rating: number;
   title: string;
   type: OfferType;
-  postDate: Date;
+  postDate: string;
   commentCount: number;
 };

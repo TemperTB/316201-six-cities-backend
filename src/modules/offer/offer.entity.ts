@@ -24,7 +24,7 @@ export class OfferEntity extends TimeStamps {
   public goods!: string[];
 
   @prop()
-  public !: string[];
+    public !: string[];
 
   @prop({required: true})
   public isPremium!: boolean;
