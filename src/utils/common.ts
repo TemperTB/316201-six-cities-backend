@@ -47,7 +47,7 @@ export const createOffer = (row: string) => {
     rating: Number(rating),
     title,
     type,
-    postDate: new Date(createdDate),
+    postDate: createdDate,
     commentCount: Number(commentCount),
   } as Offer;
 };
