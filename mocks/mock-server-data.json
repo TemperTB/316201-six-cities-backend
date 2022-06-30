@@ -33,16 +33,9 @@
       "Красота спасет мир. А этот ремонт спасут только денежные вложения"
     ],
     "images": [
-      "apartment-01.jpg",
-      "apartment-02.jpg",
-      "apartment-03.jpg",
-      "apartment-04.jpg",
-      "apartment-05.jpg",
-      "apartment-06.jpg",
-      "apartment-07.jpg",
-      "apartment-08.jpg",
-      "apartment-09.jpg",
-      "apartment-10.jpg"
+      "http://localhost:3000/static/default-preview-image-1.jpg",
+      "http://localhost:3000/static/default-preview-image-2.jpg",
+      "http://localhost:3000/static/default-preview-image-3.jpg"
     ],
     "types": [
       "apartment",
