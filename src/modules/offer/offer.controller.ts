@@ -80,8 +80,8 @@ export default class OfferController extends Controller {
       method: HttpMethod.Post,
       handler: this.create,
       middlewares: [
-        new ValidateDtoMiddleware(CreateOfferDto),
         new PrivateRouteMiddleware(),
+        new ValidateDtoMiddleware(CreateOfferDto),
       ]});
     this.addRoute({
       path: '/:offerId/image',
@@ -90,8 +90,8 @@ export default class OfferController extends Controller {
       middlewares: [
         new PrivateRouteMiddleware(),
         new ValidateObjectIdMiddleware('offerId'),
+        new CheckOwnerMiddleware(this.offerService, 'offerId'),
         new UploadFileMiddleware(this.configService.get('UPLOAD_DIRECTORY'), 'image'),
-        new CheckOwnerMiddleware(this.offerService, 'offerId')
       ]
     });
     this.addRoute({
@@ -99,9 +99,9 @@ export default class OfferController extends Controller {
       method: HttpMethod.Delete,
       handler: this.delete,
       middlewares: [
+        new PrivateRouteMiddleware(),
         new ValidateObjectIdMiddleware('offerId'),
         new DocumentExistsMiddleware(this.offerService, 'Offer', 'offerId'),
-        new PrivateRouteMiddleware(),
         new CheckOwnerMiddleware(this.offerService, 'offerId')
       ]
     });
@@ -110,10 +110,10 @@ export default class OfferController extends Controller {
       method: HttpMethod.Patch,
       handler: this.update,
       middlewares: [
+        new PrivateRouteMiddleware(),
         new ValidateObjectIdMiddleware('offerId'),
         new ValidateDtoMiddleware(UpdateOfferDto),
         new DocumentExistsMiddleware(this.offerService, 'Offer', 'offerId'),
-        new PrivateRouteMiddleware(),
         new CheckOwnerMiddleware(this.offerService, 'offerId')
       ]
     });
@@ -122,9 +122,9 @@ export default class OfferController extends Controller {
       method: HttpMethod.Patch,
       handler: this.changeFavoriteStatus,
       middlewares: [
+        new PrivateRouteMiddleware(),
         new DocumentExistsMiddleware(this.offerService, 'Offer', 'offerId'),
         new ValidateObjectIdMiddleware('offerId'),
-        new PrivateRouteMiddleware()
       ]});
     this.addRoute({
       path: '/:offerId/comments',

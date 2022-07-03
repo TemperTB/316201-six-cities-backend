@@ -11,17 +11,15 @@ export default class CLIApplication {
   private parseCommand(cliArguments: string[]): ParsedCommand {
     const parsedCommand: ParsedCommand = {};
     let command = '';
-
-    return cliArguments.reduce((acc, item) => {
+    for (const item of cliArguments) {
       if (item.startsWith('--')) {
-        acc[item] = [];
         command = item;
+        parsedCommand[command] = [];
       } else if (command && item) {
-        acc[command].push(item);
+        parsedCommand[command].push(item);
       }
-
-      return acc;
-    }, parsedCommand);
+    }
+    return parsedCommand;
   }
 
   public registerCommands(commandList: CliCommandInterface[]): void {
@@ -38,6 +36,7 @@ export default class CLIApplication {
 
   public processCommand(argv: string[]): void {
     const parsedCommand = this.parseCommand(argv);
+    console.log(parsedCommand);
     const [commandName] = Object.keys(parsedCommand);
     const command = this.getCommand(commandName);
     const commandArguments = parsedCommand[commandName] ?? [];
